@@ -25,7 +25,7 @@ enum RequestHeaders {
 
 export const Login: FC = () => {
   const [form, setForm] = useState<LoginUser>(defaultLoginUser);
-  const { user, password } = form;
+  const { user, password, op } = form;
 
   const [loginResponse, setLoginResponse] = useState<LoginResponse | null>();
   const [ldapResponse, setLdapResponse] = useState<Array<RegistrationUser>>([]);
