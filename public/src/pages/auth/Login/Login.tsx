@@ -23,9 +23,15 @@ enum RequestHeaders {
   APPLICATION_JSON = 'application/json'
 }
 
+enum FormMode {
+  BASIC = 'basic',
+  HTML = 'html',
+  CSRF = 'csrf'
+}
+
 export const Login: FC = () => {
   const [form, setForm] = useState<LoginUser>(defaultLoginUser);
-  const { user, password, op } = form;
+  const { user, password } = form;
 
   const [loginResponse, setLoginResponse] = useState<LoginResponse | null>();
   const [ldapResponse, setLdapResponse] = useState<Array<RegistrationUser>>([]);
