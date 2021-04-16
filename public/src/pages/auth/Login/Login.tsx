@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import React, { FC, FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getLdap, getUser, loadXsrfToken } from '../../../api/httpClient';
+import { getLdap, getUser } from '../../../api/httpClient';
 import {
   LoginFormMode,
   LoginResponse,
@@ -60,9 +60,7 @@ export const Login: FC = () => {
       mode === LoginFormMode.HTML
         ? { headers: { 'content-type': RequestHeaders.FORM_URLENCODED } }
         : {};
-    const params = appendParams(form);
-
-    getUser(params, config)
+    getUser(form, config)
       .then((data: LoginResponse) => {
         setLoginResponse(data);
         return data.email;
