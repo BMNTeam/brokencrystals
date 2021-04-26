@@ -12,9 +12,7 @@ export function getTestimonials(): Promise<any> {
 
 export function getTestimonialsCount(): Promise<any> {
   return makeApiRequest({
-    url: `${ApiUrl.Testimonials}/count?query=${encodeURIComponent(
-      'select count(1) as count from testimonial'
-    )}`,
+    url: `${ApiUrl.Testimonials}/count?query=${encodeURIComponent('select count(1) as count from testimonial')}`,
     method: 'get'
   });
 }
@@ -43,10 +41,7 @@ export function postUser(data: RegistrationUser): Promise<any> {
   });
 }
 
-export function getUser(
-  user: LoginUser,
-  config: AxiosRequestConfig = {}
-): Promise<any> {
+export function getUser(user: LoginUser, config: AxiosRequestConfig = {}): Promise<any> {
   const data = user.op === LoginFormMode.HTML ? mapToUrlParams(user) : user;
   return makeApiRequest({
     url: `${ApiUrl.Auth}/login`,

@@ -2,24 +2,19 @@ import { AxiosRequestConfig } from 'axios';
 import React, { FC, FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getLdap, getUser, loadXsrfToken } from '../../../api/httpClient';
-import { LoginFormMode, LoginResponse, LoginUser, RegistrationUser } from '../../../interfaces/User';
+import {
+  AuthType,
+  LoginFormMode,
+  LoginFormModeKeys,
+  LoginFormValue,
+  LoginResponse,
+  LoginUser,
+  RegistrationUser
+} from '../../../interfaces/User';
 import AuthLayout from '../AuthLayout';
 import showLdapResponse from './showLdapReponse';
 import showLoginResponse from './showLoginReponse';
 import { userManager, querySessionStatus, getUserInfo, popupSignin, signinRedirect } from '../oidc-initializer';
-
-enum FormMode {
-  BASIC = 'basic',
-  HTML = 'html',
-  CSRF = 'csrf',
-  OIDC_PASSWORD = 'oidc_password'
-}
-
-type FormModeKeys = typeof FormMode[keyof typeof FormMode] | string;
-
-interface FormValue extends LoginUser {
-  mode: FormMode;
-}
 
 const defaultLoginUser: LoginUser = {
   user: '',
@@ -27,27 +22,22 @@ const defaultLoginUser: LoginUser = {
   op: LoginFormMode.BASIC
 };
 
-enum RequestHeaders {
-  FORM_URLENCODED = 'application/x-www-form-urlencoded',
-  APPLICATION_JSON = 'application/json'
-}
-
-const defaultFormValue: FormValue = {
+const defaultFormValue: LoginFormValue = {
   ...defaultLoginUser,
-  mode: FormMode.BASIC
+  mode: LoginFormMode.BASIC
 };
 
-const formModeOptions: Record<FormModeKeys, string> = {
-  [FormMode.BASIC]: 'Simple REST-based Authentication',
-  [FormMode.HTML]: 'Simple HTML Form-based Authentication',
-  [FormMode.CSRF]: 'Simple CSRF-based Authentication',
-  [FormMode.OIDC_PASSWORD]: 'Simple password-based OIDC'
+const formModeOptions: Record<LoginFormModeKeys, string> = {
+  [LoginFormMode.BASIC]: 'Simple REST-based Authentication',
+  [LoginFormMode.HTML]: 'Simple HTML Form-based Authentication',
+  [LoginFormMode.CSRF]: 'Simple CSRF-based Authentication',
+  [LoginFormMode.OIDC_PASSWORD]: 'Simple password-based OIDC'
 };
 
 export const Login: FC = () => {
   console.warn('userManager', userManager);
 
-  const [form, setForm] = useState<FormValue>(defaultFormValue);
+  const [form, setForm] = useState<LoginFormValue>(defaultFormValue);
   const { user, password } = form;
 
   const [loginResponse, setLoginResponse] = useState<LoginResponse | null>();
@@ -74,15 +64,15 @@ export const Login: FC = () => {
   const onFormSubmit = (e: FormEvent) => {
     e.preventDefault();
     const config: Pick<AxiosRequestConfig, 'headers'> =
-      mode === LoginFormMode.HTML ? { headers: { 'content-type': RequestHeaders.FORM_URLENCODED } } : {};
+      mode === LoginFormMode.HTML ? { headers: { 'content-type': AuthType.FORM_BASED } } : {};
     const params = appendParams(form);
 
     console.warn('mode', mode);
 
     switch (mode) {
-      case FormMode.HTML:
-      case FormMode.CSRF:
-      case FormMode.BASIC: {
+      case LoginFormMode.HTML:
+      case LoginFormMode.CSRF:
+      case LoginFormMode.BASIC: {
         getUser(params, config)
           .then((data: LoginResponse) => {
             setLoginResponse(data);
@@ -91,7 +81,7 @@ export const Login: FC = () => {
           .then((email) => sessionStorage.setItem('email', email));
         break;
       }
-      case FormMode.OIDC_PASSWORD: {
+      case LoginFormMode.OIDC_PASSWORD: {
         signinRedirect({ state: params.password })
           .then((user) => {
             console.warn('popup authorized', user);
@@ -167,14 +157,8 @@ export const Login: FC = () => {
         <form onSubmit={onFormSubmit}>
           <div className="form-group">
             <label>Authentication Type</label>
-            <select
-                className="form-control"
-                name="op"
-                placeholder="Authentication Type"
-                value={mode}
-                onChange={onSelectMode}
-            >
-              {Object.keys(formModeOptions).map((key: FormModeKeys) => (
+            <select className="form-control" name="op" placeholder="Authentication Type" value={mode} onChange={onSelectMode}>
+              {Object.keys(formModeOptions).map((key: LoginFormModeKeys) => (
                 <option value={key} key={key}>
                   {formModeOptions[key]}
                 </option>
@@ -182,7 +166,7 @@ export const Login: FC = () => {
             </select>
           </div>
 
-          {mode === FormMode.OIDC_PASSWORD && (
+          {mode === LoginFormMode.OIDC_PASSWORD && (
             <div>
               <button onClick={checkOidcSession}>check oidc session</button>
             </div>
@@ -204,9 +188,7 @@ export const Login: FC = () => {
               onInput={onInput}
             />
           </div>
-          {mode === LoginFormMode.CSRF && csrf && (
-            <input name="xsrf" type="hidden" value={csrf} />
-          )}
+          {mode === LoginFormMode.CSRF && csrf && <input name="xsrf" type="hidden" value={csrf} />}
 
           {loginResponse && showLoginResponse(loginResponse)}
           <br />

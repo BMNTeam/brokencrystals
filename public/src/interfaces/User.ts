@@ -13,7 +13,14 @@ export interface LoginUser {
 export enum LoginFormMode {
   BASIC = 'basic',
   HTML = 'html',
-  CSRF = 'csrf'
+  CSRF = 'csrf',
+  OIDC_PASSWORD = 'oidc_password'
+}
+
+export type LoginFormModeKeys = typeof LoginFormMode[keyof typeof LoginFormMode] | string;
+
+export interface LoginFormValue extends LoginUser {
+  mode: LoginFormMode;
 }
 
 export interface LoginResponse {
