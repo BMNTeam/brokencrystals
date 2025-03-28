@@ -1,0 +1,64 @@
+name: Security Tests
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+permissions:
+  checks: write
+  contents: read
+
+jobs:
+  security_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install SecTester dependencies
+      run: npm i --save-dev @sectester/core @sectester/repeater @sectester/scan @sectester/runner
+
+    - name: Start services using Docker Compose
+      run: docker compose up -d
+
+    - name: Wait for application to be ready
+      run: |
+        for i in {1..30}; do
+          if nc -zv 127.0.0.1 80; then
+            echo "Application is ready!"
+            break
+          fi
+          echo "Waiting for application to be ready..."
+          sleep 5
+        done
+
+    - name: Run security tests
+      env:
+        BRIGHT_HOSTNAME: development.playground.brightsec.com
+        BRIGHT_PROJECT_ID: c5e02558-fb2b-4190-bdf6-a45a17923a2c
+        BRIGHT_TOKEN: ${{ secrets.BRIGHT_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRIGHT_TARGET_URL: http://127.0.0.1:80
+      run: |
+        node --experimental-transform-types \
+             --experimental-strip-types \
+             --experimental-detect-module \
+             --disable-warning=MODULE_TYPELESS_PACKAGE_JSON \
+             --disable-warning=ExperimentalWarning \
+             --test-force-exit \
+             --test .brightsec/tests/*.test.ts \
+             --test-concurrency=4
+
+    - name: Shut down services
+      if: always()
+      run: docker compose down
