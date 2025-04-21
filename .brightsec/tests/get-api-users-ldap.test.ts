@@ -21,7 +21,7 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('GET /api/users/ldap', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['ldapi', 'excessive_data_exposure', 'business_constraint_bypass'],
+      tests: ['ldapi', 'bopla', 'business_constraint_bypass', 'sqli'],
       attackParamLocations: [AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)

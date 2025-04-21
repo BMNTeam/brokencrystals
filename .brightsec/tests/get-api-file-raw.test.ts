@@ -21,13 +21,16 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('GET /api/file/raw', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['lfi', 'ssrf', 'excessive_data_exposure', 'open_cloud_storage'],
+      tests: ['lfi', 'ssrf', 'full_path_disclosure'],
       attackParamLocations: [AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.GET,
-      url: `${baseUrl}/api/file/raw?path=/path/to/file.txt`
+      url: `${baseUrl}/api/file/raw`,
+      query: {
+        path: 'example/path/to/file.txt'
+      }
     });
 });

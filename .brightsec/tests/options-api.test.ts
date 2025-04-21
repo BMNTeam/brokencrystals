@@ -21,13 +21,14 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('OPTIONS /api', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['http_method_fuzzing', 'osi', 'unvalidated_redirect', 'secret_tokens'],
+      tests: ['http_method_fuzzing', 'xxe', 'osi', 'unvalidated_redirect', 'secret_tokens'],
       attackParamLocations: [AttackParamLocation.HEADER]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.OPTIONS,
-      url: `${baseUrl}/api`
+      url: `${baseUrl}/api`,
+      headers: { 'Allow': 'OPTIONS, GET, HEAD, POST' }
     });
 });

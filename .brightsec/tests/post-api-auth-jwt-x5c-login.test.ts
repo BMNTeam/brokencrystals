@@ -21,7 +21,7 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('POST /api/auth/jwt/x5c/login', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['jwt', 'csrf', 'sqli', 'excessive_data_exposure', 'ldap_injection'],
+      tests: ['csrf', 'jwt', 'sqli'],
       attackParamLocations: [AttackParamLocation.BODY]
     })
     .threshold(Severity.CRITICAL)
@@ -29,7 +29,10 @@ test('POST /api/auth/jwt/x5c/login', { signal: AbortSignal.timeout(timeout) }, a
     .run({
       method: HttpMethod.POST,
       url: `${baseUrl}/api/auth/jwt/x5c/login`,
-      body: JSON.stringify({ user: 'example@example.com', password: 'password123' }),
+      body: {
+        user: "user@example.com",
+        password: "securePassword123"
+      },
       headers: { 'Content-Type': 'application/json' }
     });
 });

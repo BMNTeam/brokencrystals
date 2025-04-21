@@ -21,8 +21,8 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('GET /api/auth/simple-csrf-flow', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['csrf', 'excessive_data_exposure', 'http_method_fuzzing'],
-      attackParamLocations: [AttackParamLocation.HEADER, AttackParamLocation.PATH, AttackParamLocation.QUERY]
+      tests: ['csrf', 'xss', 'http_method_fuzzing'],
+      attackParamLocations: [AttackParamLocation.QUERY, AttackParamLocation.HEADER]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)

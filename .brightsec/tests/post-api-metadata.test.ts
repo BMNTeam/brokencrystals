@@ -21,17 +21,15 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('POST /api/metadata', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['xxe', 'excessive_data_exposure', 'osi', 'open_database'],
-      attackParamLocations: [AttackParamLocation.BODY, AttackParamLocation.HEADER]
+      tests: ['xxe', 'xss', 'unvalidated_redirect', 'open_database'],
+      attackParamLocations: [AttackParamLocation.BODY, AttackParamLocation.HEADER, AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.POST,
       url: `${baseUrl}/api/metadata`,
-      headers: {
-        'Content-Type': 'text/xml'
-      },
-      body: '<sample>XML content</sample>'
+      headers: { 'Content-Type': 'text/xml' },
+      query: { xml: '<sample>data</sample>' }
     });
 });

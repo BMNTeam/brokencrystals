@@ -18,19 +18,16 @@ after(() => runner.clear());
 const timeout = 40 * 60 * 1000;
 const baseUrl = process.env.BRIGHT_TARGET_URL!;
 
-test('POST /api/subscriptions', { signal: AbortSignal.timeout(timeout) }, async () => {
+test('GET /api/testimonials', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['csrf', 'email_injection', 'xss'],
+      tests: ['sqli', 'xss', 'csrf'],
       attackParamLocations: [AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
-      method: HttpMethod.POST,
-      url: `${baseUrl}/api/subscriptions`,
-      query: {
-        email: "example@example.com"
-      }
+      method: HttpMethod.GET,
+      url: `${baseUrl}/api/testimonials`
     });
 });

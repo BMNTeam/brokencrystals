@@ -21,13 +21,16 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('GET /api/goto', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['unvalidated_redirect', 'ssrf'],
+      tests: ['unvalidated_redirect', 'xxe', 'osi', 'open_database'],
       attackParamLocations: [AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.GET,
-      url: `${baseUrl}/api/goto?url=https://example.com`
+      url: `${baseUrl}/api/goto`,
+      query: {
+        url: 'https://example.com'
+      }
     });
 });

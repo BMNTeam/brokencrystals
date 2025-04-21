@@ -21,16 +21,17 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('GET /api/file', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['lfi', 'ssrf', 'excessive_data_exposure'],
-      attackParamLocations: [AttackParamLocation.QUERY, AttackParamLocation.HEADER]
+      tests: ['lfi', 'ssrf', 'unvalidated_redirect', 'osi'],
+      attackParamLocations: [AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.GET,
-      url: `${baseUrl}/api/file?path=/path/to/file.txt&type=application/octet-stream`,
-      headers: {
-        accept: 'application/octet-stream'
+      url: `${baseUrl}/api/file`,
+      query: {
+        path: 'example/path/to/file.txt',
+        type: 'application/pdf'
       }
     });
 });

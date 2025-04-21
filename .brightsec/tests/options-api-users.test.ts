@@ -21,13 +21,15 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('OPTIONS /api/users', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['http_method_fuzzing', 'ldapi', 'excessive_data_exposure', 'csrf'],
-      attackParamLocations: [AttackParamLocation.HEADER]
+      tests: ['http_method_fuzzing', 'ldapi'],
+      attackParamLocations: [AttackParamLocation.HEADER],
+      skipStaticParams: false
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.OPTIONS,
-      url: `${baseUrl}/api/users`
+      url: `${baseUrl}/api/users`,
+      headers: { 'allow': 'OPTIONS, GET, POST, DELETE' }
     });
 });

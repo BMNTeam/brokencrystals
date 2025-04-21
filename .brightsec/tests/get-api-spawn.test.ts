@@ -1,6 +1,6 @@
 import { test, before, after } from 'node:test';
-import { SecRunner } from '@sectester/runner';
 import { Severity, AttackParamLocation, HttpMethod } from '@sectester/scan';
+import { SecRunner } from '@sectester/runner';
 
 let runner!: SecRunner;
 
@@ -21,13 +21,16 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('GET /api/spawn', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['osi', 'xss', 'excessive_data_exposure', 'xxe'],
+      tests: ['osi', 'csrf', 'full_path_disclosure'],
       attackParamLocations: [AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.GET,
-      url: `${baseUrl}/api/spawn?command=echo%20Hello%20World`
+      url: `${baseUrl}/api/spawn`,
+      query: {
+        command: 'ls -la'
+      }
     });
 });

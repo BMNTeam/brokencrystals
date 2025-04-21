@@ -21,13 +21,16 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('DELETE /api/file', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['lfi', 'ssrf', 'excessive_data_exposure', 'mass_assignment'],
+      tests: ['lfi', 'http_method_fuzzing', 'bopla', 'ssrf'],
       attackParamLocations: [AttackParamLocation.QUERY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.DELETE,
-      url: `${baseUrl}/api/file?path=/path/to/file.txt`
+      url: `${baseUrl}/api/file`,
+      query: {
+        path: 'example/path/to/file.txt'
+      }
     });
 });

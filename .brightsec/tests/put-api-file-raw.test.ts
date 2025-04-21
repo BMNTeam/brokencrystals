@@ -21,17 +21,16 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('PUT /api/file/raw', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['file_upload', 'lfi', 'excessive_data_exposure', 'osi', 'ssrf'],
-      attackParamLocations: [AttackParamLocation.BODY, AttackParamLocation.QUERY]
+      tests: ['file_upload', 'lfi', 'ssrf', 'osi', 'full_path_disclosure'],
+      attackParamLocations: [AttackParamLocation.PATH, AttackParamLocation.BODY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.PUT,
-      url: `${baseUrl}/api/file/raw?path=/path/to/file.txt`,
-      body: '<file content>',
-      headers: {
-        'Content-Type': 'application/octet-stream'
-      }
+      url: `${baseUrl}/api/file/raw`,
+      query: { path: 'example/path/to/file.txt' },
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: '<binary data>'
     });
 });

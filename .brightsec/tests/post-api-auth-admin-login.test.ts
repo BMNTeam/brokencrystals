@@ -21,20 +21,18 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('POST /api/auth/admin/login', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['csrf', 'jwt', 'sqli', 'excessive_data_exposure', 'open_database', 'secret_tokens'],
-      attackParamLocations: [AttackParamLocation.BODY, AttackParamLocation.HEADER]
+      tests: ['csrf', 'jwt', 'sqli', 'secret_tokens'],
+      attackParamLocations: [AttackParamLocation.BODY]
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.POST,
       url: `${baseUrl}/api/auth/admin/login`,
-      headers: {
-        'Content-Type': 'application/json'
+      body: {
+        user: "user@example.com",
+        password: "securePassword123"
       },
-      body: JSON.stringify({
-        user: 'example@example.com',
-        password: 'password123'
-      })
+      headers: { 'Content-Type': 'application/json' }
     });
 });

@@ -21,15 +21,16 @@ const baseUrl = process.env.BRIGHT_TARGET_URL!;
 test('POST /api/render', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['ssti', 'xss', 'excessive_data_exposure', 'osi', 'xxe'],
-      attackParamLocations: [AttackParamLocation.BODY]
+      tests: ['ssti', 'xss', 'osi', 'xxe', 'open_database'],
+      attackParamLocations: [AttackParamLocation.BODY],
+      skipStaticParams: false
     })
     .threshold(Severity.CRITICAL)
     .timeout(timeout)
     .run({
       method: HttpMethod.POST,
       url: `${baseUrl}/api/render`,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Sample template text'
+      body: "Sample template text",
+      headers: { 'Content-Type': 'text/plain' }
     });
 });
